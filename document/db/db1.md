@@ -41,7 +41,7 @@
 * **출석하다(Attend)**
   * 강좌(lectureId)
   * 주차(week)
-  * 출결(check)
+  * 출결(attendance)
   * 학생(studentId)
 * **수강하다(Take)**
   * 학생(studentId)
@@ -49,13 +49,112 @@
 
 <br>
 
-## ER 모델
+## 개념적 ER 다이어그램
 
-![image](https://user-images.githubusercontent.com/43431081/80275362-a9bfaf80-871b-11ea-8f0a-e32497d392eb.png)
+![image](https://user-images.githubusercontent.com/43431081/80284663-cc24ed80-875a-11ea-9a13-6817a7432352.png)
 
 <br>
 
-## ER 다이어그램
+## 물리적 ER 다이어그램
 
-![image](https://user-images.githubusercontent.com/43431081/80275932-cf4eb800-871f-11ea-8b13-1e7e2b59ddcf.png)
+![image](https://user-images.githubusercontent.com/43431081/80284686-fa0a3200-875a-11ea-8174-536700660324.png)
 
+<br>
+
+## SQL
+
+### STUDENT
+
+* **CREATE**
+
+  ```sql
+  create table student (
+    id serial primary key,
+    name varchar(10),
+    password varchar(20),
+    fingerprint text unique
+  );
+  ```
+
+<br>
+
+### PROFESSOR
+
+* **CREATE**
+
+  ```sql
+  create table professor (
+    id serial primary key,
+    name varchar(10),
+    password varchar(20)
+  );
+  ```
+
+<br>
+
+### ROOM
+
+* **CREATE**
+
+  ```sql
+  create table room (
+    id serial primary key,
+    dong varchar(5),
+    ho integer unique
+  );
+  ```
+
+<br>
+
+### COURSE
+
+* **CREATE**
+
+  ```sql
+  create table course (
+    id serial primary key,
+    title varchar(30),
+    startTime timestamp,
+    endTime timestamp,
+    class integer,
+    day date,
+    professorId integer,
+    roomId integer,
+    foreign key (professorId) references professor (id),
+    foreign key (roomId) references room (id)
+  );
+  ```
+
+<br>
+
+### ATTEND
+
+* **CREATE**
+
+  ```sql
+  create table attend (
+    studentId integer,
+    courseId integer,
+    week integer,
+    attendance text,
+    foreign key (studentId) references student (id),
+    foreign key (courseId) references course (id)
+  );
+  ```
+
+<br>
+
+### TAKE
+
+* **CREATE **
+
+  ```sql
+  create table take (
+    studentId integer,
+    courseId integer,
+    foreign key (studentId) references student (id),
+    foreign key (courseId) references course (id)
+  );
+  ```
+
+  
