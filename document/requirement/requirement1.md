@@ -3,10 +3,12 @@
 - [x] DB 설계
 
   - [x] 1차 DB 설계
+  - [ ] 2차 DB 설계
 
 - [x] DB 구축
 
   - [x] 1차 DB 구축
+  - [ ] 2차 DB 구축
 
 - [ ] Spring REST API 설계
 
