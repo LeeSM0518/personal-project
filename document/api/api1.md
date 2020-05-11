@@ -1,7 +1,9 @@
 # API
 
-## REST API Domain
+## Spring REST API Domain
 
-* **/login**
-* **/students/{studentId}/courses**
-  * **/courses/{courseId}**
+* /login
+* /students/{studentId}/courses
+  * /students/{studentId}/courses/{courseId}
+* /professor/{professorId}/courses
+* 
