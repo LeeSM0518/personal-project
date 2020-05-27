@@ -19,7 +19,7 @@
 
 * **학생(student)**
   * 식별자(id)
-  * 학번(studentId)
+  * 학번(studentCode)
   * 비밀번호(password)
   * 이름(name)
   * 지문(fingerprint)
@@ -42,7 +42,7 @@
   * 좌석 상태(status)
 * **교수(Professor)**
   * 식별자(id)
-  * 학번(professorId)
+  * 학번(professorCode)
   * 비밀번호(password)
   * 이름(name)
 * **출석하다(Attend)**
@@ -58,7 +58,7 @@
 
 ## 물리적 ER 다이어그램
 
-![image](https://user-images.githubusercontent.com/43431081/82751902-67aa8c00-9df5-11ea-9595-92b1e5f1b41a.png)
+![image](https://user-images.githubusercontent.com/43431081/83050718-e9b1e380-a087-11ea-877a-e3aa99772e98.png)
 
 <br>
 
@@ -71,11 +71,18 @@
   ```sql
   create table student (
     id serial primary key,
-    studentId varchar(10),
+    studentCode varchar(10),
     name varchar(10),
     password varchar(20),
-    fingerprint text unique
+    fingerprint text
   );
+  ```
+
+* **INSERT**
+
+  ```sql
+  insert into student (studentCode, name, password) values
+  ('20171687', '이상민', '1234');
   ```
 
 <br>
@@ -87,10 +94,17 @@
   ```sql
   create table professor (
     id serial primary key,
-    professorId varchar(10),
+    professorCode varchar(10),
     name varchar(10),
     password varchar(20)
   );
+  ```
+
+* **INSERT**
+
+  ```sql
+  insert into professor (professorCode, name, password) values
+  ('30171687', '박종권', '1234');
   ```
 
 <br>
@@ -103,8 +117,15 @@
   create table room (
     id serial primary key,
     dong varchar(5),
-    ho integer unique
+    ho integer
   );
+  ```
+
+* **INSERT**
+
+  ```sql
+  insert into room (dong, ho) values
+  ('N4', 401), ('N4', 402);
   ```
 
 <br>
@@ -117,15 +138,22 @@
   create table course (
     id serial primary key,
     title varchar(30),
-    startTime timestamp,
-    endTime timestamp,
+    startTime time,
+    endTime time,
     class integer,
-    day date,
+    day varchar(5),
     professorId integer,
     roomId integer,
     foreign key (professorId) references professor (id),
     foreign key (roomId) references room (id)
   );
+  ```
+
+* **INSERT**
+
+  ```sql
+  insert into course (title, startTime, endTime, class, day, professorId, roomId) values
+  ('회로이론', '09:00:00', '12:00:00', 1, '월', 1, 1);
   ```
 
 <br>
@@ -146,6 +174,13 @@
   );
   ```
 
+* **INSERT**
+
+  ```sql
+  insert into attend (studentId, courseId, week, attendance) values
+  (1, 1, 1, '출석');
+  ```
+
 <br>
 
 ### TAKE
@@ -161,6 +196,12 @@
   );
   ```
 
+* **INSERT**
+
+  ```sql
+  insert into take (studentId, courseId) values
+  (1, 1);
+  ```
 
 <br>
 
@@ -170,11 +211,19 @@
 
   ```sql
   create table seat (
+    id serial primary key,
   	seatNumber integer,
   	roomId integer,
   	status varchar(30),
   	foreign key (roomId) references room (id)
   );
+  ```
+
+* **INSERT**
+
+  ```sql
+  insert into seat (seatNumber, roomId, status) values
+  (1, 1, '빈자리'), (2, 1, '예약');
   ```
 
   
