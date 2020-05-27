@@ -107,8 +107,18 @@
 한 강좌를 수강하는 한 학생의 출석 생성 API
 
 * 수신 데이터
+
   * Integer studentId(학생 식별자)
+
   * Integer courseId(강의 식별자)
+
+  * body
+
+    ```json
+    {
+      "attendance": String 	// 출석상태
+    }
+    ```
 
 <br>
 
@@ -204,8 +214,8 @@
   ```json
   [
     {
-      "week": Integer,
-      "attendance": String
+      "week": Integer,			// 주차
+      "attendance": String	// 출결
     },
     ...
   ]
@@ -229,6 +239,84 @@
 
     ```json
     {
-      
+      "attendance": String	// 출결
     }
     ```
+
+<br>
+
+### /room
+
+#### GET /room/{roomId}/courses
+
+하나의 강의실에서 강의하는 강좌들 조회 API
+
+* 수신 데이터
+
+  * Integer roomId(강의실 식별자)
+
+* 송신 데이터
+
+  ```json
+  [
+    {
+      "id": Integer, 				// 강좌번호
+      "title": String,			// 강좌이름
+      "startTime": String, 	// 시작시간
+      "endTime": String, 		// 종료시간
+      "day": String,			 	// 강의요일
+      "professor": String, 	// 수업 담당교수 성함
+      "class": Integer, 	 	// 분반
+    },
+    ...
+  ]
+  ```
+
+<br>
+
+#### GET /room/{roomId}/courses/{courseId}/seets
+
+해당 강의실에서 강의하는 한 강좌의 좌석을 조회 API
+
+* 수신 데이터
+
+  * Integer roomId(강의실 식별자)
+  * Integer courseId(강좌 식별자)
+
+* 송신 데이터
+
+  ```json
+  [
+    {
+      "id": Integer,					// 식별자
+      "seatNumber": Integer,	// 좌석 번호
+      "status": String				// 좌석 상태
+    },
+    ...
+  ]
+  ```
+
+<br>
+
+#### PUT /room/{roomId}/courses/{courseId}/seets/{seetId}
+
+해당 강의실에서 강의하는 한 강좌의 좌석 상태 변경 API
+
+* 수신 데이터
+
+  * Integer roomId(강의실 식별자)
+
+  * Integer courseId(강좌 식별자)
+
+  * Integer seetId(좌석 식별자)
+
+  * body
+
+    ```json
+    {
+      "status": String // 좌석 상태
+    }
+    ```
+
+<br>
+
