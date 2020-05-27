@@ -12,8 +12,8 @@
   * /professor/{professorId}/courses/{courseId}/students/{studentId}/attendances (GET)
   * /professor/{professorId}/courses/{courseId}/students/{studentId}/attendances/{attendanceId} (PUT)
 * /room/{roomId}/courses (GET)
-  * /room/{roomId}/courses/{courseId}/seets (GET)
-  * /room/{roomId}/courses/{courseId}/seets/{seetId} (PUT)
+  * /room/{roomId}/courses/{courseId}/seats (GET)
+  * /room/{roomId}/courses/{courseId}/seats/{seatId} (PUT)
 
 <br>
 
@@ -25,7 +25,8 @@
 
   ```json
   {
-    "studentId": String,	// 학번
+    "option": String,			// 교수 or 학생. ex) professor , student
+    "username": String,		// 학번
     "password": String		// 비밀번호
   }
   ```
@@ -36,16 +37,31 @@
 
     ```json
     {
-      "name": String // 이름
+      "id": Integer,			// 식별자
+      "name": String 			// 이름
     }
+```
+    
+
+* 매퍼
+
+  * option == professor
+
+    ```sql
+    select id, name
+    from professor
+    where professorCode = #{username} and
+    password = #{password}
     ```
 
-    * `200` 코드 반환
+  * option == student
 
-  * 실패 시
-
-    * 일치하는 아이디가 존재하지 않을 때 `404` 반환
-    * 비밀번호가 맞지 않을 때 `401` 반환
+    ```sql
+    select id, name
+    from student
+    where studentCode = #{username} and
+    password = #{password}
+    ```
 
 <br>
 
@@ -62,6 +78,7 @@
   ```json
   [
     {
+      "id": Integer, 				// 강의코드
       "title": String,			// 강좌이름
       "startTime": String, 	// 시작시간
       "endTime": String, 		// 종료시간
@@ -75,6 +92,16 @@
     },
     ...
   ]
+  ```
+
+* 매퍼
+
+  ```sql
+  select c.id, c.title, c.startTime, c.endTime, c.class, c.day, p.name,
+  r.dong, r.ho
+  from take t, course c, professor p, room r
+  where t.studentId = #{id} and t.course = c.id and 
+  c.professor = p.id and c.roomId = r.id
   ```
 
 <br>
@@ -100,6 +127,14 @@
   ]
   ```
 
+* 매퍼
+
+  ```sql
+  select a.week, a.attendance
+  from attend a, course c
+  where c.id = #{courseId} and a.course = c.id
+  ```
+
 <br>
 
 #### POST /students/{studentId}/courses/{courseId}/attendances
@@ -116,9 +151,17 @@
 
     ```json
     {
+      "week": Integer, 			// 주차
       "attendance": String 	// 출석상태
     }
     ```
+
+* 매퍼
+
+  ```sql
+  insert into attend (student, course, week, attendance) values
+  (#{studentId}, #{courseId}, #{week} , #{attentance})
+  ```
 
 <br>
 
@@ -137,6 +180,7 @@
   ```json
   [
     {
+      "id": Integer, 				// 강의코드
       "title": String,			// 강좌이름
       "startTime": String, 	// 시작시간
       "endTime": String, 		// 종료시간
@@ -148,7 +192,15 @@
       }
     },
     ...
-  ]
+  
+  ```
+
+* 매퍼
+
+  ```sql
+  select c.id, c.title, c.startTime, c.endTime, c.day, c.class, r.dong, r.ho
+  from course c, room r
+  where c.professorId = #{id} and c.roomId = r.id
   ```
 
 <br>
@@ -174,6 +226,14 @@
   ]
   ```
 
+* 매퍼
+
+  ```sql
+  select s.seatNumber, s.status
+  from course c, room r, seat s
+  where c.id = #{courseId} and c.roomId = r.id and r.id = s.roomId
+  ```
+
 <br>
 
 #### GET /professor/{professorId}/courses/{courseId}/students
@@ -190,11 +250,20 @@
   ```json
   [
     {
+      "id": Integer, 				// 식별자
       "studentId": String,	// 학번
-      "name": String // 학생 이름
+      "name": String 				// 학생 이름
     },
     ...
   ]
+  ```
+
+* 매퍼
+
+  ```sql
+  select s.id, s.studentId, s.name
+  from take t, student s
+  where t.courseId = #{courseId} and t.studentId = s.id
   ```
 
 <br>
@@ -214,11 +283,20 @@
   ```json
   [
     {
+      "id": Integer, 				// 식별자
       "week": Integer,			// 주차
       "attendance": String	// 출결
     },
     ...
   ]
+  ```
+
+* 매퍼
+
+  ```sql
+  select a.id, a.week, a.attendance
+  from attend a, student s
+  where s.id = #{studentId} and s.id = a.studentId and a.courseId = #{courseId}
   ```
 
 <br>
@@ -242,6 +320,14 @@
       "attendance": String	// 출결
     }
     ```
+
+* 매퍼
+
+  ```sql
+  update attend
+  set attendance=#{attendance}
+  where id=#{attendanceId}
+  ```
 
 <br>
 
@@ -272,9 +358,17 @@
   ]
   ```
 
+* 매퍼
+
+  ```sql
+  select c.id, c.title, c.startTime, c.endTime, c.day, c.professor, c.class
+  from room r, course c
+  where r.id=#{roomId} and r.id = c.roomId
+  ```
+
 <br>
 
-#### GET /room/{roomId}/courses/{courseId}/seets
+#### GET /room/{roomId}/courses/{courseId}/seats
 
 해당 강의실에서 강의하는 한 강좌의 좌석을 조회 API
 
@@ -296,9 +390,17 @@
   ]
   ```
 
+* 매퍼
+
+  ```sql
+  select s.id, s.seatNumber, s.status
+  from course c, seat s
+  where c.id = #{courseId} and c.roomId = s.roomId
+  ```
+
 <br>
 
-#### PUT /room/{roomId}/courses/{courseId}/seets/{seetId}
+#### PUT /room/{roomId}/courses/{courseId}/seats/{seatId}
 
 해당 강의실에서 강의하는 한 강좌의 좌석 상태 변경 API
 
@@ -308,7 +410,7 @@
 
   * Integer courseId(강좌 식별자)
 
-  * Integer seetId(좌석 식별자)
+  * Integer seatId(좌석 식별자)
 
   * body
 
@@ -317,6 +419,14 @@
       "status": String // 좌석 상태
     }
     ```
+
+* 매퍼
+
+  ```sql
+  update seat
+  set status=#{status}
+  where seatId=#{seatId}
+  ```
 
 <br>
 
