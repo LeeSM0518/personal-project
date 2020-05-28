@@ -6,14 +6,14 @@
 * /students/{id}/courses (GET)
   * /students/{studentId}/courses/{courseId}/attendances (GET)
   * /students/{studentId}/courses/{courseId}/attendances (POST)
-* /professor/{id}/courses (GET)
-  * /professor/{professorId}/courses/{courseId}/seats (GET)
-  * /professor/{professorId}/courses/{courseId}/students (GET)
-  * /professor/{professorId}/courses/{courseId}/students/{studentId}/attendances (GET)
-  * /professor/{professorId}/courses/{courseId}/students/{studentId}/attendances/{attendanceId} (PUT)
-* /room/{roomId}/courses (GET)
-  * /room/{roomId}/courses/{courseId}/seats (GET)
-  * /room/{roomId}/courses/{courseId}/seats/{seatId} (PUT)
+* /professors/{id}/courses (GET)
+  * /professors/{professorId}/courses/{courseId}/seats (GET)
+  * /professors/{professorId}/courses/{courseId}/students (GET)
+  * /professors/{professorId}/courses/{courseId}/students/{studentId}/attendances (GET)
+  * /professors/{professorId}/courses/{courseId}/students/{studentId}/attendances/{attendanceId} (PUT)
+* /rooms/{roomId}/courses (GET)
+  * /rooms/{roomId}/courses/{courseId}/seats (GET)
+  * /rooms/{roomId}/courses/{courseId}/seats/{seatId} (PUT)
 
 <br>
 
@@ -78,17 +78,15 @@
   ```json
   [
     {
-      "id": Integer, 				// 강의코드
-      "title": String,			// 강좌이름
-      "startTime": String, 	// 시작시간
-      "endTime": String, 		// 종료시간
-      "day": String,			 	// 강의요일
-      "professor": String, 	// 수업 담당교수 성함
-      "class": Integer, 	 	// 분반
-      "room": {							// 강의실
-        "dong": String, 			// 동
-        "ho": Integer 				// 호
-      }
+      "id": Integer, 					// 강의코드
+      "title": String,				// 강좌이름
+      "startTime": String, 		// 시작시간
+      "endTime": String, 			// 종료시간
+      "day": String,			 		// 강의요일
+      "name": String, 				// 수업 담당교수 성함
+      "_class": Integer, 	 		// 분반
+      "dong": String, 			// 동
+      "ho": Integer 				// 호
     },
     ...
   ]
@@ -97,11 +95,11 @@
 * 매퍼
 
   ```sql
-  select c.id, c.title, c.startTime, c.endTime, c.class, c.day, p.name,
+  select c.id, c.title, c.startTime, c.endTime, c._class, c.day, p.name,
   r.dong, r.ho
   from take t, course c, professor p, room r
-  where t.studentId = #{id} and t.course = c.id and 
-  c.professor = p.id and c.roomId = r.id
+  where t.studentId = #{id} and t.courseId = c.id and 
+  c.professorId = p.id and c.roomId = r.id
   ```
 
 <br>
@@ -120,8 +118,9 @@
   ```json
   [
     {
-      "week": Integer, // 주차
-      "attendance": Text // 출결
+      "id": Integer, 			// 번호
+      "week": Integer, 		// 주차
+      "attendance": Text 	// 출결
     },
     ...
   ]
@@ -130,9 +129,9 @@
 * 매퍼
 
   ```sql
-  select a.week, a.attendance
-  from attend a, course c
-  where c.id = #{courseId} and a.course = c.id
+  select week, attendance
+  from attend
+  where studentid = #{studentid} and courseId = #{courseId}
   ```
 
 <br>
@@ -159,15 +158,14 @@
 * 매퍼
 
   ```sql
-  insert into attend (student, course, week, attendance) values
-  (#{studentId}, #{courseId}, #{week} , #{attentance})
+  insert into attend (studentId, courseId, week, attendance) values (#{studentId}, #{courseId}, #{week} , #{attendance})
   ```
 
 <br>
 
-### /professor
+### /professors
 
-#### GET /professor/{id}/courses
+#### GET /professors/{id}/courses
 
 자신이 강의하는 강좌 조회 API
 
@@ -185,11 +183,9 @@
       "startTime": String, 	// 시작시간
       "endTime": String, 		// 종료시간
       "day": String,			 	// 강의요일
-      "class": Integer, 	 	// 분반
-      "room": {							// 강의실
-        "dong": String, 			// 동
-        "ho": Integer 				// 호
-      }
+      "_class": Integer, 	 	// 분반
+      "dong": String, 			// 동
+      "ho": Integer 				// 호
     },
     ...
   
@@ -205,7 +201,7 @@
 
 <br>
 
-#### GET /professor/{professorId}/courses/{courseId}/seats
+#### GET /professors/{professorId}/courses/{courseId}/seats
 
 자신이 강의하는 강좌의 강의실의 좌석들 조회 API
 
@@ -219,6 +215,7 @@
   ```json
   [
     {
+      "id": Integer,
       "seatNumber" : Integer,
       "status": String
     },
@@ -230,13 +227,13 @@
 
   ```sql
   select s.seatNumber, s.status
-  from course c, room r, seat s
-  where c.id = #{courseId} and c.roomId = r.id and r.id = s.roomId
+  from course c, seat s
+  where c.id = #{courseId} and c.roomId = s.roomId
   ```
 
 <br>
 
-#### GET /professor/{professorId}/courses/{courseId}/students
+#### GET /professors/{professorId}/courses/{courseId}/students
 
 자신이 강의하는 하나의 강좌의 학생들 조회 API
 
@@ -250,9 +247,9 @@
   ```json
   [
     {
-      "id": Integer, 				// 식별자
-      "studentId": String,	// 학번
-      "name": String 				// 학생 이름
+      "id": Integer, 					// 식별자
+      "studentCode": String,	// 학번
+      "name": String 					// 학생 이름
     },
     ...
   ]
@@ -261,14 +258,14 @@
 * 매퍼
 
   ```sql
-  select s.id, s.studentId, s.name
+  select s.id, s.studentCode, s.name
   from take t, student s
   where t.courseId = #{courseId} and t.studentId = s.id
   ```
 
 <br>
 
-#### GET /professor/{professorId}/courses/{courseId}/students/{studentId}/attendances
+#### GET /professors/{professorId}/courses/{courseId}/students/{studentId}/attendances
 
 자신이 강의하는 하나의 강좌의 한 명의 학생의 출석들 조회 API
 
@@ -294,14 +291,14 @@
 * 매퍼
 
   ```sql
-  select a.id, a.week, a.attendance
-  from attend a, student s
-  where s.id = #{studentId} and s.id = a.studentId and a.courseId = #{courseId}
+  select id, week, attendance
+  from attend
+  where studentId = #{studentId} and courseId = #{courseId}
   ```
 
 <br>
 
-#### PUT /professor/{professorId}/courses/{courseId}/students/{studentId}/attendances/{attendanceId}
+#### PUT /professors/{professorId}/courses/{courseId}/students/{studentId}/attendances/{attendanceId}
 
 자신이 강의하는 하나의 강좌의 한 명의 학생의 출석 변경 API
 
@@ -331,9 +328,9 @@
 
 <br>
 
-### /room
+### /rooms
 
-#### GET /room/{roomId}/courses
+#### GET /rooms/{roomId}/courses
 
 하나의 강의실에서 강의하는 강좌들 조회 API
 
@@ -368,7 +365,7 @@
 
 <br>
 
-#### GET /room/{roomId}/courses/{courseId}/seats
+#### GET /rooms/{roomId}/courses/{courseId}/seats
 
 해당 강의실에서 강의하는 한 강좌의 좌석을 조회 API
 
@@ -400,7 +397,7 @@
 
 <br>
 
-#### PUT /room/{roomId}/courses/{courseId}/seats/{seatId}
+#### PUT /rooms/{roomId}/courses/{courseId}/seats/{seatId}
 
 해당 강의실에서 강의하는 한 강좌의 좌석 상태 변경 API
 
