@@ -140,7 +140,7 @@
     title varchar(30),
     startTime time,
     endTime time,
-    class integer,
+    _class integer,
     day varchar(5),
     professorId integer,
     roomId integer,
@@ -152,7 +152,7 @@
 * **INSERT**
 
   ```sql
-  insert into course (title, startTime, endTime, class, day, professorId, roomId) values
+  insert into course (title, startTime, endTime, _class, day, professorId, roomId) values
   ('회로이론', '09:00:00', '12:00:00', 1, '월', 1, 1);
   ```
 
