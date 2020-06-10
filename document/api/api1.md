@@ -40,8 +40,7 @@
       "id": Integer,			// 식별자
       "name": String 			// 이름
     }
-```
-    
+    ```
 
 * 매퍼
 
@@ -53,7 +52,6 @@
     where professorCode = #{username} and
     password = #{password}
     ```
-
   * option == student
 
     ```sql
@@ -349,7 +347,7 @@
       "endTime": String, 		// 종료시간
       "day": String,			 	// 강의요일
       "professor": String, 	// 수업 담당교수 성함
-      "class": Integer, 	 	// 분반
+      "_class": Integer, 	 	// 분반
     },
     ...
   ]
@@ -358,9 +356,9 @@
 * 매퍼
 
   ```sql
-  select c.id, c.title, c.startTime, c.endTime, c.day, c.professor, c.class
-  from room r, course c
-  where r.id=#{roomId} and r.id = c.roomId
+  select c.id, c.title, c.startTime, c.endTime, c.day, p.name, c._class
+  from room r, course c, professor p
+  where r.id=#{roomId} and p.id = c.professorId and r.id = c.roomId
   ```
 
 <br>
@@ -422,7 +420,7 @@
   ```sql
   update seat
   set status=#{status}
-  where seatId=#{seatId}
+  where id=#{seatId}
   ```
 
 <br>
