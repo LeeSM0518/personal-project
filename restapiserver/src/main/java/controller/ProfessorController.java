@@ -2,10 +2,7 @@ package controller;
 
 import dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import service.AttendService;
 import service.CourseService;
 import service.SeatService;
@@ -45,6 +42,12 @@ public class ProfessorController {
   public List<Attend> selectAttendByStudentIdAndProfessorId(@PathVariable("studentId") int studentId,
                                                             @PathVariable("courseId") int courseId) {
     return attendService.selectListByStudentIdAndCourseId(studentId, courseId);
+  }
+
+  @PutMapping("/{professorId}/courses/{courseId}/students/{studentId}/attendances/{attendanceId}")
+  public void updateAttendById(@RequestBody Attend attend,
+                               @PathVariable("attendanceId") int attendanceId) {
+    attendService.updateAttend(attend, attendanceId);
   }
 
 }

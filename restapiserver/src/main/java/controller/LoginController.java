@@ -18,8 +18,7 @@ public class LoginController {
 
   @PostMapping("/login")
   public LoginResponse login(@RequestBody LoginRequest request) {
-    LoginResponse response = service.login(request.getOption(), request.getUsername(), request.getPassword());
-    return response;
+    return service.login(request.getOption(), request.getUsername(), request.getPassword());
   }
 
 }

@@ -22,9 +22,7 @@ public interface AttendMapper {
                     @Param("week") int week,
                     @Param("attendance") String attendance);
 
-  @Update("update attend set attendance=#{attendance} where id=#{attendanceId}")
-  void putAttend(@Param("attendance") String attendance,
-                 @Param("attendanceId") int id);
-  // TODO 컨트롤러, 서비스 구현
+  @Update("update attend set attendance=#{attendance} where id=#{id}")
+  void putAttend(Attend attend);
 
 }

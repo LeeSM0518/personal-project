@@ -26,4 +26,8 @@ public class AttendService {
     mapper.insertAttend(studentId, courseId, request.getWeek(), request.getAttendance());
   }
 
+  public void updateAttend(Attend attend, int attendanceId) {
+    mapper.putAttend(new Attend(attendanceId, attend.getWeek(), attend.getAttendance()));
+  }
+
 }
