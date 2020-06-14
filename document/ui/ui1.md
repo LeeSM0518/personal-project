@@ -41,7 +41,7 @@
 
 <br>
 
-#### 출석 현황 (/student/attendances)
+#### 출석 현황 (/student/courses/{courseId}/attendances)
 
 <img src="https://user-images.githubusercontent.com/43431081/84584531-7f978d80-ae40-11ea-8b2b-3e82b5c9f39f.png" alt="image" style="zoom:40%;" />
 
