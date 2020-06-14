@@ -76,7 +76,7 @@
   ```json
   [
     {
-      "id": Integer, 					// 강의코드
+      "id": Integer, 					// 강좌코드
       "title": String,				// 강좌이름
       "startTime": String, 		// 시작시간
       "endTime": String, 			// 종료시간
