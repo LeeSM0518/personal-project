@@ -11,7 +11,7 @@ import java.util.List;
 public interface AttendMapper {
 
   @Select("select id, week, attendance from attend " +
-      "where studentId = #{studentId} and courseId = #{courseId}")
+      "where studentId = #{studentId} and courseId = #{courseId} order by week")
   List<Attend> selectListByStudentIdAndCourseId(@Param("studentId") int studentId,
                                                 @Param("courseId") int courseId);
 
