@@ -5,3 +5,12 @@ function createInstanceWithAuth(url) {
     baseURL: `${process.env.VUE_APP_API_URL}${url}`,
   });
 }
+
+const auth = createInstanceWithAuth('login');
+
+function login(userData) {
+  return auth.post('', userData);
+}
+
+export const student = createInstanceWithAuth('students');
+export { login };
