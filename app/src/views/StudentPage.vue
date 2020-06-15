@@ -54,6 +54,7 @@ export default {
     linkAttendances(id, title) {
       this.$router.push({
         path: `/student/courses/${id}/attendance`,
+        // TODO router 를 통해 값 전달
         params: { title: title },
       });
     },
