@@ -1,27 +1,27 @@
 <template>
   <v-app>
     <v-app-bar app color="grey lighten-2">
-      <v-toolbar-title>{{
-        $store.getters.getName + ' ' + $store.getters.getUsername
-      }}</v-toolbar-title>
+      <v-toolbar-title>{{ $store.getters.getName }}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn small @click="logout">로그아웃</v-btn>
     </v-app-bar>
     <v-main>
-      <!-- Provides the application the proper gutter -->
       <v-container fluid>
         <template>
           <v-card
+            elevation="5"
             class="mx-auto"
             max-width="344"
             v-for="course in courses"
             :key="course.id"
             :class="`mb-5`"
-            @click="linkAttendances(course.id, course.title)"
+            @click="linkMenu(course.id, course.title)"
           >
             <v-card-text>
               <p class="display-1 text--primary">
                 {{ course.title }}
               </p>
-              <p>{{ course.name }}</p>
+              <div class="text--primary">분반 : {{ course._class }}</div>
               <div class="text--primary">강의요일 : {{ course.day }}</div>
               <div class="text--primary">
                 강의실 : {{ course.dong }}동 {{ course.ho }}호
@@ -39,7 +39,8 @@
 </template>
 
 <script>
-import { fetchCourses } from '@/api/student';
+import { fetchCourse } from '@/api/professor';
+
 export default {
   data() {
     return {
@@ -48,15 +49,18 @@ export default {
   },
   methods: {
     async fetchData() {
-      const { data } = await fetchCourses(this.$store.getters.getUserId);
+      const { data } = await fetchCourse(this.$store.getters.getUserId);
       this.courses = data;
     },
-    linkAttendances(id, title) {
+    linkMenu(id, title) {
       this.$router.push({
-        path: `/student/courses/${id}/attendance`,
-        // TODO router 를 통해 값 전달
-        params: { title: title },
+        path: `/professor/courses/${id}`,
+        query: { title: title },
       });
+    },
+    async logout() {
+      await this.$store.commit('clearUser');
+      this.$router.push('/login');
     },
   },
   created() {

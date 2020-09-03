@@ -1,7 +1,9 @@
 <template>
   <v-app>
     <v-app-bar app color="grey lighten-2">
-      <v-toolbar-title>{{ $router.params.title }}</v-toolbar-title>
+      <v-toolbar-title>{{ $route.query.title }}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn small @click="back">뒤로가기</v-btn>
     </v-app-bar>
     <v-simple-table :class="`mt-15`">
       <template v-slot:default>
@@ -26,51 +28,15 @@
 import { fetchAttendances } from '@/api/student';
 
 export default {
+  props: {
+    title: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       attendances: [],
-      desserts: [
-        {
-          name: 'Frozen Yogurt',
-          calories: 159,
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-        },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-        },
-        {
-          name: 'Jelly bean',
-          calories: 375,
-        },
-        {
-          name: 'Lollipop',
-          calories: 392,
-        },
-        {
-          name: 'Honeycomb',
-          calories: 408,
-        },
-        {
-          name: 'Donut',
-          calories: 452,
-        },
-        {
-          name: 'KitKat',
-          calories: 518,
-        },
-      ],
     };
   },
   methods: {
@@ -78,7 +44,11 @@ export default {
       const userId = this.$store.getters.getUserId;
       const courseId = this.$route.params.id;
       const { data } = await fetchAttendances(userId, courseId);
+      console.log(data);
       this.attendances = data;
+    },
+    back() {
+      window.history.back();
     },
   },
   created() {

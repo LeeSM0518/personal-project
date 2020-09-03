@@ -13,4 +13,5 @@ function login(userData) {
 }
 
 export const student = createInstanceWithAuth('students');
+export const professor = createInstanceWithAuth('professors');
 export { login };
