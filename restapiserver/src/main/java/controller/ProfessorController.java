@@ -33,21 +33,25 @@ public class ProfessorController {
     return seatService.selectListByCourseId(id);
   }
 
+  @PutMapping("/{professorId}/courses/{courseId}/seats")
+  public void updateAllSeatByCourseId(@PathVariable("courseId") int id) {
+    seatService.updateByCourseId(id);
+  }
+
   @GetMapping("/{professorId}/courses/{courseId}/students")
-  public List<SimpleStudent> selectStudentsByCourseId(@PathVariable("courseId") int id) {
-    return studentService.selectListByCourseId(id);
+  public List<GetAttendForProfessor> selectStudentsByCourseId(@PathVariable("courseId") int id) {
+    return attendService.selectStudentAndAttendByStudentIdAndCourseId(id);
   }
 
   @GetMapping("/{professorId}/courses/{courseId}/students/{studentId}/attendances")
   public List<Attend> selectAttendByStudentIdAndProfessorId(@PathVariable("studentId") int studentId,
                                                             @PathVariable("courseId") int courseId) {
-    return attendService.selectListByStudentIdAndCourseId(studentId, courseId);
+    return attendService.selectListForProfessorByStudentIdAndCourseId(studentId, courseId);
   }
 
   @PutMapping("/{professorId}/courses/{courseId}/students/{studentId}/attendances/{attendanceId}")
-  public void updateAttendById(@RequestBody Attend attend,
-                               @PathVariable("attendanceId") int attendanceId) {
-    attendService.updateAttend(attend, attendanceId);
+  public void updateAttendById(@RequestBody Attend attend) {
+    attendService.updateAttend(attend);
   }
 
 }

@@ -12,6 +12,6 @@ import lombok.Setter;
 public class AttendPostRequest {
 
   private int week;
-  private String attendance;
+  private double attendance;
 
 }

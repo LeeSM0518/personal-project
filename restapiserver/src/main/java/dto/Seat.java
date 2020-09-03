@@ -13,6 +13,6 @@ public class Seat {
 
   private int id;
   private int seatNumber;
-  private String status;
+  private String name;
 
 }

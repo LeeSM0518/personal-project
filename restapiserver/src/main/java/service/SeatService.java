@@ -21,4 +21,8 @@ public class SeatService {
     return list;
   }
 
+  public void updateByCourseId(int id) {
+    mapper.updateByCourseId(id);
+  }
+
 }

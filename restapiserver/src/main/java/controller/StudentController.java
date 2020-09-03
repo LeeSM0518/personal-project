@@ -3,6 +3,7 @@ package controller;
 import dto.Attend;
 import dto.AttendPostRequest;
 import dto.Course;
+import dto.GetAttend;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import service.AttendService;
@@ -25,8 +26,8 @@ public class StudentController {
   }
 
   @GetMapping("/{studentId}/courses/{courseId}/attendances")
-  public List<Attend> selectAttendListByCourseId(@PathVariable("studentId") int studentId,
-                                                 @PathVariable("courseId") int courseId) {
+  public List<GetAttend> selectAttendListByCourseId(@PathVariable("studentId") int studentId,
+                                                    @PathVariable("courseId") int courseId) {
     return attendService.selectListByStudentIdAndCourseId(studentId, courseId);
   }
 

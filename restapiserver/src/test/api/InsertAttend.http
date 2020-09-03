@@ -1,0 +1,297 @@
+POST http://localhost:8080/students/1/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 1,
+  "attendance": 1
+}
+
+###
+POST http://localhost:8080/students/1/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 2,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/1/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 3,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/1/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 4,
+  "attendance": 0
+}
+
+###
+
+POST http://localhost:8080/students/1/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 5,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 1,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 2,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 3,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 4,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 5,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 1,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 2,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 3,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 4,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/1/attendances
+Content-Type: application/json
+
+{
+  "week": 5,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/1/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 1,
+  "attendance": 1
+}
+
+###
+POST http://localhost:8080/students/1/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 2,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/1/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 3,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/1/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 4,
+  "attendance": 0
+}
+
+###
+
+POST http://localhost:8080/students/1/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 5,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 1,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 2,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 3,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 4,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/2/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 5,
+  "attendance": 1
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 1,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 2,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 3,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 4,
+  "attendance": 0.5
+}
+
+###
+
+POST http://localhost:8080/students/3/courses/2/attendances
+Content-Type: application/json
+
+{
+  "week": 5,
+  "attendance": 1
+}
+
+###

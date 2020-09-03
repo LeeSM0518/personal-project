@@ -1,0 +1,4 @@
+PUT http://localhost:8080/professors/1/courses/1/seats
+Content-Type: application/json
+
+###
