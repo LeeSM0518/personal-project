@@ -1,5 +1,6 @@
 package mapper;
 
+import dto.GetSeatByDevice;
 import dto.Seat;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -25,8 +26,18 @@ public interface SeatMapper {
       "where roomId = ( " +
       "    select roomId " +
       "    from course " +
-      "    where id = 1 " +
+      "    where id = #{id} " +
       ")")
-  void updateByCourseId(@Param("id") int id);
+  void updateReservedToNullByCourseId(@Param("id") int id);
+
+  @Update("update seat " +
+      "set reserved = #{studentId} " +
+      "where roomId = #{roomId} and seatNumber = #{seatNumber}")
+  void updateReservedToStudentIdByCourseId(@Param("studentId") int studentId,
+                                           @Param("roomId") int roomId,
+                                           @Param("seatNumber") int seatNumber);
+
+  @Select("select id, seatNumber, reserved from seat where roomid = #{roomId} order by seatNumber")
+  List<GetSeatByDevice> selectListByRoomId(@Param("roomId") int roomId);
 
 }

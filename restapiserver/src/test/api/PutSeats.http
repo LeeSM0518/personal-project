@@ -2,3 +2,12 @@ PUT http://localhost:8080/professors/1/courses/1/seats
 Content-Type: application/json
 
 ###
+
+PUT http://localhost:8080/seats
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "roomId": 1,
+  "seatNumber": 1
+}

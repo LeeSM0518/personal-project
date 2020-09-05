@@ -1,5 +1,6 @@
 package service;
 
+import dto.GetSeatByDevice;
 import dto.Seat;
 import error.SeatNotFoundException;
 import mapper.SeatMapper;
@@ -22,7 +23,15 @@ public class SeatService {
   }
 
   public void updateByCourseId(int id) {
-    mapper.updateByCourseId(id);
+    mapper.updateReservedToNullByCourseId(id);
+  }
+
+  public void updateReservedToStudentIdByCourseId(int studentId, int roomId, int seatNumber) {
+    mapper.updateReservedToStudentIdByCourseId(studentId, roomId, seatNumber);
+  }
+
+  public List<GetSeatByDevice> selectListByRoomId(int roomId) {
+    return mapper.selectListByRoomId(roomId);
   }
 
 }

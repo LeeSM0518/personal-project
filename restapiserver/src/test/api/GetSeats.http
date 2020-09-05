@@ -2,3 +2,11 @@ GET http://localhost:8080/professors/1/courses/1/seats
 Accept: application/json
 
 ###
+
+GET http://localhost:8080/rooms/1/seats
+Accept: application/json
+
+###
+
+GET http://192.168.43.136:8080/rooms/1/seats
+Accept: application/json

@@ -1,6 +1,7 @@
 package service;
 
 import dto.Course;
+import dto.RoomDto;
 import dto.Seat;
 import dto.SelectCourseListByRoomIdResponse;
 import mapper.RoomMapper;
@@ -14,6 +15,10 @@ public class RoomService {
 
   @Autowired
   private RoomMapper mapper;
+
+  public List<RoomDto> selectAll() {
+    return mapper.selectAll();
+  }
 
   public List<SelectCourseListByRoomIdResponse> selectCourseLisByRoomId(int id) {
     return mapper.selectCourseListByRoomId(id);

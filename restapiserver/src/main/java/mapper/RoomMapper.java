@@ -1,6 +1,7 @@
 package mapper;
 
 import dto.Course;
+import dto.RoomDto;
 import dto.Seat;
 import dto.SelectCourseListByRoomIdResponse;
 import org.apache.ibatis.annotations.Param;
@@ -14,6 +15,9 @@ public interface RoomMapper {
   @Select("select c.id, c.title, c.startTime, c.endTime, c.day, p.name, c._class " +
       "from room r, course c, professor p where r.id = #{roomId} and c.professorId = p.id and r.id = c.roomId")
   List<SelectCourseListByRoomIdResponse> selectCourseListByRoomId(@Param("roomId") int roomId);
+
+  @Select("select id, dong, ho from room")
+  List<RoomDto> selectAll();
 
   @Select("select s.id, s.seatNumber, s.status " +
       "from course c, seat s " +
