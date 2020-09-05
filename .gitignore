@@ -283,3 +283,7 @@ gradle-app.setting
 **/build/
 
 # End of https://www.gitignore.io/api/git,macos,gradle,windows,jetbrains,intellij+all,intellij+iml
+
+/device/inf
+/device/__pycache__
+/device/info.txt
