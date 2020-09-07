@@ -49,5 +49,11 @@ class Client:
 if __name__ == '__main__':
     client = Client('http://localhost:8080')
 
-    rooms = client.getRooms().json()
-    roomsTexts = [rooms[i]['dong'] + '동 ' + rooms[i]['ho']  + '호' for i in range(len(rooms))]
+    # rooms = client.getRooms().json()
+    # roomsTexts = [rooms[i]['dong'] + '동 ' + rooms[i]['ho']  + '호' for i in range(len(rooms))]
+    seatsByApi = client.getSeatsByRoomId(1).json()
+    seats = {}
+
+    # for elem in seatsByApi:
+    #     seats[elem['seatNumber']] =
+
