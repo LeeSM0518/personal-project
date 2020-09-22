@@ -1,6 +1,7 @@
 package controller;
 
 import dto.LoginRequest;
+import dto.LoginRequestByDevice;
 import dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,11 @@ public class LoginController {
   @PostMapping("/login")
   public LoginResponse login(@RequestBody LoginRequest request) {
     return service.login(request.getOption(), request.getUsername(), request.getPassword());
+  }
+
+  @PostMapping("/devicelogin")
+  public LoginResponse loginByDevice(@RequestBody LoginRequestByDevice request) {
+    return service.loginByDevice(request.getOption(), request.getUsername(), request.getBirthday());
   }
 
 }

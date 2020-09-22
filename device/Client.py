@@ -31,29 +31,41 @@ class Client:
         }
         return requests.post(self.URL + '/login', json=data)
 
-    def postFingerprint(self, finger):
-        '''
-            지문 인식 메소드
+    def loginByDevice(self, option, username, password):
+        data = {
+            'option': option,
+            'username': username,
+            'birthday': password
+        }
+        return requests.post(self.URL + '/devicelogin', json=data)
 
-            *
-        '''
+    def getFingerprint(self):
+        fingerprintList = requests.get(self.URL + '/students/fingerprint').json()
+        notNoneFingerprintList = []
+        for elem in fingerprintList:
+            if elem['fingerprint'] is not None:
+                notNoneFingerprintList.append(elem)
+        return notNoneFingerprintList
 
-    def postAttendance(self, studentId):
-        '''
-            출석 인증 메소드
+    def updateFingerprint(self, studentId, fingerprint):
+        data = {
+            'fingerprint': str(fingerprint)
+        }
+        return requests.put(self.URL + '/students/' + str(studentId) + '/fingerprint', json=data)
 
-            * 지문 인식 API로 응답받은 studentId로 출석 인증 API를 호출
-        '''
+    def postAttendance(self, studentId, courseId):
+        data = {
+            "attendance": 1
+        }
+        return requests.post(self.URL + '/students/' + str(studentId) + '/courses/' +
+                             str(courseId) + '/attendances', json=data)
 
 
 if __name__ == '__main__':
     client = Client('http://localhost:8080')
-
-    # rooms = client.getRooms().json()
-    # roomsTexts = [rooms[i]['dong'] + '동 ' + rooms[i]['ho']  + '호' for i in range(len(rooms))]
-    seatsByApi = client.getSeatsByRoomId(1).json()
-    seats = {}
-
-    # for elem in seatsByApi:
-    #     seats[elem['seatNumber']] =
-
+    result = client.getCoursesByRoomId(1)
+    print(result)
+    print(result.json())
+    print(str(result.json()[0]['id']))
+    # fingerprint = client.getFingerprint()
+    # print(fingerprint)

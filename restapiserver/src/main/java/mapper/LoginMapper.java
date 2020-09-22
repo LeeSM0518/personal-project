@@ -13,4 +13,10 @@ public interface LoginMapper {
   @Select("select id, name from student where studentCode=#{code} and password=#{password}")
   Student selectOneStudentByCodeAndPassWord(@Param("code") String code, @Param("password") String password);
 
+  @Select("select id, name from student where studentCode=#{code} and birthday=#{birthday}")
+  Student selectOneStudentByCodeAndBirthday(@Param("code") String code, @Param("birthday") String birthday);
+
+  @Select("select id, name from professor where professorCode=#{code} and birthday=#{birthday}")
+  Professor selectOneProfessorByCodeAndBirthday(@Param("code") String code, @Param("birthday") String birthday);
+
 }

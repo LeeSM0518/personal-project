@@ -45,7 +45,12 @@ public class AttendService {
   }
 
   public void insertAttend(int studentId, int courseId, AttendPostRequest request) {
-    mapper.insertAttend(studentId, courseId, request.getWeek(), request.getAttendance());
+    List<Attend> list = mapper.selectListByStudentIdAndCourseId(studentId, courseId);
+    int integer = list.stream()
+        .map(Attend::getWeek)
+        .max(Integer::compareTo)
+        .orElse(1);
+    mapper.insertAttend(studentId, courseId, integer == 1 ? 1 : integer + 1, request.getAttendance());
   }
 
   public void updateAttend(Attend attend) {

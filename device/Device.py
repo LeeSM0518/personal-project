@@ -1,9 +1,13 @@
 import sys
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+
 from PyQt5.QtCore import *
-from DeviceInfo import DeviceInfo
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
 from Client import Client
+from DeviceInfo import DeviceInfo
+from FingerPrintService import FingerPrintService
+import threading
 
 
 class DeviceApp(QWidget):
@@ -13,6 +17,8 @@ class DeviceApp(QWidget):
     parentLayout = QVBoxLayout()
     deviceInfo = DeviceInfo()
     client = Client('http://192.168.43.136:8080')
+    fingerPrinter = FingerPrintService()
+
     fingerFailCount = 0
 
     def __init__(self):
@@ -21,6 +27,8 @@ class DeviceApp(QWidget):
 
     def initUI(self):
         self.roomId = self.deviceInfo.getRoomId()
+        result = self.client.getCoursesByRoomId(self.roomId)
+        self.courseId = result.json()[0]['id']
 
         if self.roomId is None:
             self.showLoginForDeviceSettingDialog()
@@ -29,8 +37,7 @@ class DeviceApp(QWidget):
 
     def showSeatsDialog(self, studentId):
         self.seatsDialog = QDialog(self)
-        self.seatsDialog.resize(800, 480)
-        self.centerObject(self.seatsDialog)
+        self.seatsDialog.resize(800, 430)
 
         blackboard = QLabel('칠판', self.seatsDialog)
         blackboard.setStyleSheet("color: white; background-color: grey;")
@@ -52,19 +59,23 @@ class DeviceApp(QWidget):
         backDoor.setStyleSheet("color: white; background-color: grey;")
         backDoor.setFont(font)
         backDoor.setFixedSize(30, 80)
-        backDoor.move(750, 350)
+        backDoor.move(750, 300)
         backDoor.setAlignment(Qt.AlignCenter)
 
         windowLabel = QLabel('창\n문', self.seatsDialog)
         windowLabel.setStyleSheet("color: white; background-color: grey;")
         windowLabel.setFont(font)
-        windowLabel.setFixedSize(30, 400)
+        windowLabel.setFixedSize(30, 350)
         windowLabel.move(20, 40)
         windowLabel.setAlignment(Qt.AlignCenter)
 
         backButton = QPushButton('뒤로가기', self.seatsDialog)
-        backButton.move(360, 440)
+        backButton.move(20, 400)
         backButton.clicked.connect(self.seatDialogBackButtonClicked)
+
+        registerButton = QPushButton('지문 등록', self.seatsDialog)
+        registerButton.move(680, 400)
+        registerButton.clicked.connect(lambda ch, id=studentId: self.registerFingerprint(id))
 
         response = self.client.getSeatsByRoomId(self.roomId)
         if response.status_code != 200:
@@ -89,7 +100,38 @@ class DeviceApp(QWidget):
                     seat.clicked.connect(lambda ch, seatNum=seat.text(): self.seatButtonClicked(seatNum, studentId))
                     count += 1
 
+        self.centerObject(self.seatsDialog)
         self.seatsDialog.show()
+
+    def registerFingerprint(self, studentId):
+        self.fingerDialog = QDialog(self)
+        self.fingerDialog.resize(800, 400)
+        vBox = QVBoxLayout()
+        fingerProcessingLabel = QLabel('지문을 인식기에 올려주세요.\n등록 완료시,'
+                                       ' 자동으로 창이 사라집니다.')
+        fingerProcessingFont = fingerProcessingLabel.font()
+        fingerProcessingFont.setPointSize(15)
+        fingerProcessingLabel.setFont(fingerProcessingFont)
+        fingerProcessingLabel.setAlignment(Qt.AlignCenter)
+
+        fingerImage = QPixmap('./img/fingerAfter.png')
+        fingerLabel = QLabel()
+        fingerLabel.setPixmap(fingerImage)
+        fingerLabel.setAlignment(Qt.AlignCenter)
+
+        vBox.addWidget(fingerProcessingLabel)
+        vBox.addWidget(fingerLabel)
+
+        self.fingerDialog.setLayout(vBox)
+        self.fingerDialog.show()
+
+        threading.Thread(target=self.register, args=(str(studentId))).start()
+
+    def register(self, studentId):
+        result = self.client.updateFingerprint(studentId, self.fingerPrinter.getFinger())
+        if (result.status_code != 200):
+            print('실패')
+        self.fingerDialog.close()
 
     def seatDialogBackButtonClicked(self):
         self.seatsDialog.close()
@@ -97,6 +139,7 @@ class DeviceApp(QWidget):
     def seatButtonClicked(self, seatNumber, studentId):
         response = self.client.putSeatByStudentIdAndRoomIdAndSeatNumber(studentId, self.roomId, seatNumber)
         if response.status_code == 200:
+            self.client.postAttendance(studentId, self.courseId)
             self.showSuccessMessageBox()
             self.seatsDialog.close()
         else:
@@ -140,14 +183,14 @@ class DeviceApp(QWidget):
         mainLabelFont.setBold(True)
         mainLabel.setFont(mainLabelFont)
 
-        self.fingerProcessingLabel = QLabel()
+        self.fingerProcessingLabel = QLabel('화면 터치시 지문 인식이 진행됩니다')
         fingerProcessingFont = self.fingerProcessingLabel.font()
         fingerProcessingFont.setPointSize(15)
         self.fingerProcessingLabel.setFont(fingerProcessingFont)
         self.fingerProcessingLabel.setAlignment(Qt.AlignCenter)
 
         self.fingerImage = QPixmap('./img/fingerBefore.png')
-        self.fingerLabel = QLabel()
+        self.fingerLabel = QLabel('', self)
         self.fingerLabel.setPixmap(self.fingerImage)
         self.fingerLabel.setAlignment(Qt.AlignCenter)
 
@@ -260,71 +303,165 @@ class DeviceApp(QWidget):
         self.fingerLabel.setPixmap(self.fingerImage)
         self.fingerLabel.setAlignment(Qt.AlignCenter)
 
-    ''' 지문 인식 메소드 '''
-
     def mousePressEvent(self, QMouseEvent):
         self.fingerProcessingLabel.setText('지문 인식을 진행중 입니다')
         self.setAfterFingerImage()
-        # TODO 지문 인식의 결과로 받은 학생 번호(studentId)를 self.studentId에 저장하는 로직
-
-    ''' 지문 인식 완료 후 메소드'''
 
     def mouseReleaseEvent(self, QMouseEvent):
-        self.fingerProcessingLabel.setText('')
-        self.setBeforeFingerImage()
-        self.showCheckFingerMessageBox()
+        self.checkFinger()
 
-    def showCheckFingerMessageBox(self):
-        reply = QMessageBox.question(self, '지문 인식', '지문 인식이 완료되었습니다.\n김민주 님이 맞습니까?',
+    def checkFinger(self):
+        studentList = self.client.getFingerprint()
+        student = self.fingerPrinter.compareFinger(studentList)
+        if student is None:
+            self.showFailFingerMessageBox()
+        else:
+            self.showCheckFingerMessageBox(student)
+        self.fingerProcessingLabel.setText('화면 터치시 지문 인식이 진행됩니다')
+        self.setBeforeFingerImage()
+
+    def showCheckFingerMessageBox(self, student):
+        reply = QMessageBox.question(self, '지문 인식', '지문 인식이 완료되었습니다.\n' + student['name'] +
+                                     ' 님이 맞습니까?',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
         if reply == QMessageBox.Yes:
-            ''' 지문인식 완료 후 전달받은 studentId를 넘기는 로직 수정 필요 '''
-            studentId = 3
+            studentId = student['id']
             self.showSeatsDialog(studentId)
         elif reply == QMessageBox.No:
             self.fingerFailCount += 1
             if self.fingerFailCount == 5:
-                self.showLoginForAttendanceDialog()
+                self.showLoginForUsernameAttendanceDialog()
                 self.fingerFailCount = 0
 
-    def showLoginForAttendanceDialog(self):
-        self.loginForAttendanceDialog = QDialog(self)
+    def showFailFingerMessageBox(self):
+        reply = QMessageBox.question(self, '지문 인식 실패', '지문이 등록되어 있지 않습니다.\n'
+                                                       '지문 인식을 재시도 해주세요.',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        self.fingerFailCount += 1
+        if reply is not None:
+            if self.fingerFailCount == 5:
+                self.showLoginForUsernameAttendanceDialog()
+                self.fingerFailCount = 0
 
-        self.loginForAttendanceDialog.setWindowTitle('로그인')
+    def showLoginForUsernameAttendanceDialog(self):
+        self.loginForUsernameAttendanceDialog = QDialog(self)
+
+        self.loginForUsernameAttendanceDialog.setWindowTitle('로그인')
 
         usernameLayout = QHBoxLayout()
         passwordLayout = QHBoxLayout()
+        keyLayout = QHBoxLayout()
         parentLayout = QVBoxLayout()
+        menuLayout = QHBoxLayout()
 
         description = QLabel('출석을 위해 로그인을 해주세요.(지문인식 실패 5회)')
 
-        usernameLabel = QLabel('아이디 : ')
+        usernameLabel = QLabel('학번 : ')
         self.usernameEditForAttendance = QLineEdit(self)
-        passwordLabel = QLabel('비밀번호 : ')
-        self.passwordEditForAttendance = QLineEdit(self)
-        self.passwordEditForAttendance.setEchoMode(QLineEdit.Password)
-        loginBtn = QPushButton('로그인')
-        loginBtn.clicked.connect(self.loginForAttendance)
+
+        for btn in range(10):
+            button = QPushButton(str(btn))
+            button.setFixedSize(50, 50)
+            button.clicked.connect(lambda ch, num=str(btn), editText=self.usernameEditForAttendance:
+                                   self.clickedNumKey(editText, num))
+            keyLayout.addWidget(button)
+
+        backButton = QPushButton('지우기')
+        backButton.clicked.connect(lambda ch, editText=self.usernameEditForAttendance:
+                                   self.clickedBackKey(editText))
+        keyLayout.addWidget(backButton)
+
+        loginBtn = QPushButton('확인')
+        loginBtn.clicked.connect(lambda: self.showLoginForBirthdayAttendanceDialog())
+
+        cancelBtn = QPushButton('취소')
+        cancelBtn.clicked.connect(lambda ch, dialog=self.loginForUsernameAttendanceDialog:
+                                  dialog.close())
+
+        menuLayout.addWidget(loginBtn)
+        menuLayout.addWidget(cancelBtn)
 
         usernameLayout.addWidget(usernameLabel)
         usernameLayout.addWidget(self.usernameEditForAttendance)
-        passwordLayout.addWidget(passwordLabel)
-        passwordLayout.addWidget(self.passwordEditForAttendance)
 
         parentLayout.addWidget(description)
         parentLayout.addLayout(usernameLayout)
         parentLayout.addLayout(passwordLayout)
-        parentLayout.addWidget(loginBtn)
+        parentLayout.addLayout(keyLayout)
+        parentLayout.addLayout(menuLayout)
 
-        self.loginForAttendanceDialog.setLayout(parentLayout)
-        self.loginForAttendanceDialog.show()
+        self.loginForUsernameAttendanceDialog.setLayout(parentLayout)
+        self.loginForUsernameAttendanceDialog.show()
+
+    def invisibleDialog(self, dialog):
+        dialog.close()
+
+    def showLoginForBirthdayAttendanceDialog(self):
+        self.loginForBirthdayAttendanceDialog = QDialog(self)
+
+        self.loginForBirthdayAttendanceDialog.setWindowTitle('로그인')
+
+        usernameLayout = QHBoxLayout()
+        passwordLayout = QHBoxLayout()
+        keyLayout = QHBoxLayout()
+        parentLayout = QVBoxLayout()
+        menuLayout = QHBoxLayout()
+
+        description = QLabel('출석을 위해 로그인을 해주세요.(지문인식 실패 5회)')
+
+        usernameLabel = QLabel('생년월일 (주민등록번호 앞 6자) : ')
+        self.birthdayEditForAttendance = QLineEdit(self)
+
+        for btn in range(10):
+            button = QPushButton(str(btn))
+            button.setFixedSize(50, 50)
+            button.clicked.connect(lambda ch, num=str(btn), editText=self.birthdayEditForAttendance:
+                                   self.clickedNumKey(editText, num))
+            keyLayout.addWidget(button)
+
+        backButton = QPushButton('지우기')
+        backButton.clicked.connect(lambda ch, editText=self.birthdayEditForAttendance:
+                                   self.clickedBackKey(editText))
+        keyLayout.addWidget(backButton)
+
+        loginBtn = QPushButton('로그인')
+        loginBtn.clicked.connect(self.loginForAttendance)
+
+        cancelBtn = QPushButton('취소')
+        cancelBtn.clicked.connect(lambda ch, dialog=self.loginForBirthdayAttendanceDialog:
+                                  dialog.close())
+
+        menuLayout.addWidget(loginBtn)
+        menuLayout.addWidget(cancelBtn)
+
+        usernameLayout.addWidget(usernameLabel)
+        usernameLayout.addWidget(self.birthdayEditForAttendance)
+
+        parentLayout.addWidget(description)
+        parentLayout.addLayout(usernameLayout)
+        parentLayout.addLayout(passwordLayout)
+        parentLayout.addLayout(keyLayout)
+        parentLayout.addLayout(menuLayout)
+
+        self.loginForBirthdayAttendanceDialog.setLayout(parentLayout)
+        self.loginForBirthdayAttendanceDialog.show()
+
+    def clickedBackKey(self, editText):
+        if len(editText.text()) > 0:
+            result = editText.text()[:len(editText.text()) - 1]
+            editText.setText(result)
+
+    def clickedNumKey(self, editText, btn):
+        result = editText.text() + str(btn)
+        editText.setText(result)
 
     def loginForAttendance(self):
-        result = self.client.login('student',
-                                   self.usernameEditForAttendance.text(),
-                                   self.passwordEditForAttendance.text())
+        result = self.client.loginByDevice('student',
+                                           self.usernameEditForAttendance.text(),
+                                           self.birthdayEditForAttendance.text())
         if result.status_code == 200:
-            self.loginForAttendanceDialog.close()
+            self.loginForUsernameAttendanceDialog.close()
+            self.loginForBirthdayAttendanceDialog.close()
             self.showSeatsDialog(result.json()['id'])
         elif result.status_code == 500:
             self.showServerErrorMessageBox()
@@ -332,6 +469,7 @@ class DeviceApp(QWidget):
             self.showFailLoginMessageBox()
 
     def showSuccessMessageBox(self):
+        self.fingerFailCount = 0
         reply = QMessageBox.question(self, '', '출석이 완료되었습니다.',
                                      QMessageBox.Yes, QMessageBox.Yes)
         if reply == QMessageBox.Yes:

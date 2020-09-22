@@ -1,5 +1,6 @@
 package service;
 
+import dto.GetStudentFingerprint;
 import dto.SimpleStudent;
 import error.StudentNotFoundException;
 import mapper.StudentMapper;
@@ -19,6 +20,14 @@ public class StudentService {
     if (list == null || list.size() == 0)
       throw new StudentNotFoundException();
     return list;
+  }
+
+  public void updateFingerprintByStudentId(String finger, int studentId) {
+    mapper.updateFingerprintByStudentId(finger, studentId);
+  }
+
+  public List<GetStudentFingerprint> selectListForFingerprint() {
+    return mapper.selectListForFingerprint();
   }
 
 }

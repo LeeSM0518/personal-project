@@ -1,0 +1,14 @@
+PUT http://localhost:8080/students/1/fingerprint
+Content-Type: application/json
+
+{
+  "fingerprint" : "test"
+}
+
+###
+
+GET http://localhost:8080/students/fingerprint
+Content-Type: application/json
+
+###
+

@@ -1,13 +1,11 @@
 package controller;
 
-import dto.Attend;
-import dto.AttendPostRequest;
-import dto.Course;
-import dto.GetAttend;
+import dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import service.AttendService;
 import service.CourseService;
+import service.StudentService;
 
 import java.util.List;
 
@@ -15,6 +13,8 @@ import java.util.List;
 @RequestMapping("/students")
 public class StudentController {
 
+  @Autowired
+  private StudentService studentService;
   @Autowired
   private CourseService courseService;
   @Autowired
@@ -36,6 +36,17 @@ public class StudentController {
                            @PathVariable("courseId") int courseId,
                            @RequestBody AttendPostRequest request) {
     attendService.insertAttend(studentId, courseId, request);
+  }
+
+  @PutMapping("/{studentId}/fingerprint")
+  public void updateFingerprintByStudentId(@PathVariable("studentId") int studentId,
+                                           @RequestBody UpdateFingerPrint dto) {
+    studentService.updateFingerprintByStudentId(dto.getFingerprint(), studentId);
+  }
+
+  @GetMapping("/fingerprint")
+  public List<GetStudentFingerprint> selectListForFingerprint() {
+    return studentService.selectListForFingerprint();
   }
 
 }

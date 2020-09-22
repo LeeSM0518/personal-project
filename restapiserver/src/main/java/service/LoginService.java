@@ -19,6 +19,12 @@ public class LoginService {
         loginForProfessor(code, password) : loginForStudent(code, password);
   }
 
+  public LoginResponse loginByDevice(String option, String code, String birthday) {
+    return option.equals("professor") ?
+        loginForProfessorByDevice(code, birthday) : loginForStudentByDevice(code, birthday);
+  }
+
+
   private LoginResponse loginForProfessor(String code, String password) {
     Professor professor = mapper.selectOneProfessorByCodeAndPassWord(code, password);
     if (professor == null || professor.getName().equals(""))
@@ -28,6 +34,20 @@ public class LoginService {
 
   private LoginResponse loginForStudent(String code, String password) {
     Student student = mapper.selectOneStudentByCodeAndPassWord(code, password);
+    if (student == null || student.getName().equals(""))
+      throw new MemberNotFoundException();
+    return new LoginResponse(student.getId(), student.getName());
+  }
+
+  private LoginResponse loginForProfessorByDevice(String code, String birthday) {
+    Professor professor = mapper.selectOneProfessorByCodeAndBirthday(code, birthday);
+    if (professor == null || professor.getName().equals(""))
+      throw new MemberNotFoundException();
+    return new LoginResponse(professor.getId(), professor.getName());
+  }
+
+  private LoginResponse loginForStudentByDevice(String code, String birthday) {
+    Student student = mapper.selectOneStudentByCodeAndBirthday(code, birthday);
     if (student == null || student.getName().equals(""))
       throw new MemberNotFoundException();
     return new LoginResponse(student.getId(), student.getName());

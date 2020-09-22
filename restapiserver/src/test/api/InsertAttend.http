@@ -2,7 +2,6 @@ POST http://localhost:8080/students/1/courses/1/attendances
 Content-Type: application/json
 
 {
-  "week": 1,
   "attendance": 1
 }
 
